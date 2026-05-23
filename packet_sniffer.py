@@ -25,15 +25,21 @@ def packet_callback(packet):
     else:
         print(packet.summary())
 
-print("Starting packet capture... Press Ctrl+C to stop.")
+def main():
+    parser = argparse.ArgumentParser(description="Leitor de pacotes a partir de arquivo PCAP")
+    parser.add_argument("-r", "--read", required=True, help="Caminho do arquivo .pcap")
+    args = parser.parse_args()
 
-# Filter for IP packets (you can change this to 'tcp', 'udp', 'port 80', etc.)
-# For more filter options, see: https://biot.com/capstats/bpf.html
-packets = sniff(prn=packet_callback, count=10, filter="ip")
+    print(f"Iniciando leitura do arquivo PCAP: {args.read}")
 
-print("Packet capture finished.")
+    sniff(
+        offline=args.read,
+        prn=packet_callback,
+        store=False
+    )
 
-# Save captured packets to a pcap file
-output_file = "captured_packets.pcap"
-wrpcap(output_file, packets)
-print(f"Captured packets saved to {output_file}")
+    print("Leitura do arquivo PCAP finalizada.")
+
+
+if __name__ == "__main__":
+   main()
