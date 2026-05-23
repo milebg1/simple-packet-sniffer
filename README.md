@@ -1,4 +1,4 @@
-# Simple Packet Sniffer - Funcionalidade de Análise Offline HTTP
+# Leitor de Navegação HTTP para Arquivos PCAP
 
 Este projeto é uma extensão do software original [Simple Packet Sniffer](https://github.com/Artificial-Ryan/simple-packet-sniffer), desenvolvido como requisito para a disciplina de Redes de Computadores.
 
