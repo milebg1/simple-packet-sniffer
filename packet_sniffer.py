@@ -1,13 +1,46 @@
 from scapy.all import *
 # Estas linhas abaixo são o "seguro" contra o erro de 'IP not defined'
 from scapy.layers.inet import IP, TCP, UDP
-from scapy.layers import http
+import argparse
+
+#HTTP
+def analisar_http(packet):
+    if packet.haslayer(TCP) and packet.haslayer(Raw):
+        tcp = packet[TCP]
+
+        if tcp.sport == 80 or tcp.dport == 80:
+            payload = packet[Raw].load.decode("utf-8", errors="ignore")
+
+            if "HTTP" in payload or payload.startswith(("GET", "POST", "HEAD")):
+                print("\n[HTTP DETECTADO]")
+                print(f"Porta origem: {tcp.sport}")
+                print(f"Porta destino: {tcp.dport}")
+
+                linhas = payload.split("\r\n")
+                primeira_linha = linhas[0]
+                print(f"Linha inicial: {primeira_linha}")
+
+                if primeira_linha.startswith(("GET", "POST", "HEAD")):
+                    partes = primeira_linha.split()
+
+                    metodo = partes[0] if len(partes) > 0 else "-"
+                    recurso = partes[1] if len(partes) > 1 else "-"
+
+                    host = "Não identificado"
+
+                    for linha in linhas:
+                        if linha.lower().startswith("host:"):
+                            host = linha.split(":", 1)[1].strip()
+                            break
+
+                    print(f"[NAVEGAÇÃO] Site: {host} | Ação: {metodo} | Recurso: {recurso}")
 
 def packet_callback(packet):
     if packet.haslayer(IP):
         src_ip = packet[IP].src
         dst_ip = packet[IP].dst
         protocol = packet[IP].proto
+        analisar_http(packet) #chama função http    
 
         print(f"Source IP: {src_ip}, Destination IP: {dst_ip}, Protocol: {protocol}")
 
