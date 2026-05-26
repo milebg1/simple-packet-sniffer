@@ -18,4 +18,4 @@ Antes de executar, você precisará do Python 3 e da biblioteca Scapy instalados
 git clone https://github.com/milebg1/simple-packet-sniffer.git
 cd simple-packet-sniffer
 pip install -r requirements.txt
-python packet_sniffer.py -r teste_http.pcap
+python packet_sniffer.py -r teste.pcap
