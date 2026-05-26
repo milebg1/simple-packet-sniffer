@@ -12,5 +12,10 @@ Esta nova versão expande o programa para atuar como uma ferramenta de **anális
 ## Pré-requisitos
 Antes de executar, você precisará do Python 3 e da biblioteca Scapy instalados.
 
+## Instruções de Execução
+
 ```bash
-pip install scapy
+git clone https://github.com/milebg1/simple-packet-sniffer.git
+cd simple-packet-sniffer
+pip install -r requirements.txt
+python packet_sniffer.py -r teste_http.pcap
