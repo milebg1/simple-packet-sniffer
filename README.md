@@ -1,6 +1,11 @@
 # Leitor de Navegação HTTP para Arquivos PCAP
 
-Este projeto é uma extensão do software original [Simple Packet Sniffer](https://github.com/Artificial-Ryan/simple-packet-sniffer), desenvolvido como requisito para a disciplina de Redes de Computadores.
+## Créditos
+
+Este projeto foi desenvolvido a partir do software Simple Packet Sniffer, disponível em:
+https://github.com/Artificial-Ryan/simple-packet-sniffer
+
+O código foi adaptado para fins acadêmicos, com a implementação da leitura offline de arquivos PCAP e interpretação de cabeçalhos HTTP.
 
 ## Nova Funcionalidade Implementada
 O software original atuava apenas na captura em tempo real, isolando informações das camadas de rede e transporte (IP e TCP/UDP). 
