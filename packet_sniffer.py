@@ -1,9 +1,10 @@
 from scapy.all import *
-# Estas linhas abaixo são o "seguro" contra o erro de 'IP not defined'
 from scapy.layers.inet import IP, TCP, UDP
 import argparse
+import sys
 
-#HTTP
+requisicoes_http = []
+
 def analisar_http(packet):
     if packet.haslayer(TCP) and packet.haslayer(Raw):
         tcp = packet[TCP]
@@ -12,13 +13,8 @@ def analisar_http(packet):
             payload = packet[Raw].load.decode("utf-8", errors="ignore")
 
             if "HTTP" in payload or payload.startswith(("GET", "POST", "HEAD")):
-                print("\n[HTTP DETECTADO]")
-                print(f"Porta origem: {tcp.sport}")
-                print(f"Porta destino: {tcp.dport}")
-
                 linhas = payload.split("\r\n")
-                primeira_linha = linhas[0]
-                print(f"Linha inicial: {primeira_linha}")
+                primeira_linha = linhas[0] if len(linhas) > 0 else ""
 
                 if primeira_linha.startswith(("GET", "POST", "HEAD")):
                     partes = primeira_linha.split()
@@ -33,14 +29,15 @@ def analisar_http(packet):
                             host = linha.split(":", 1)[1].strip()
                             break
 
-                    print(f"[NAVEGAÇÃO] Site: {host} | Ação: {metodo} | Recurso: {recurso}")
+                    requisicoes_http.append(f"[NAVEGAÇÃO] Site: {host} | Ação: {metodo} | Recurso: {recurso}")
 
 def packet_callback(packet):
     if packet.haslayer(IP):
         src_ip = packet[IP].src
         dst_ip = packet[IP].dst
         protocol = packet[IP].proto
-        analisar_http(packet) #chama função http    
+        
+        analisar_http(packet)
 
         print(f"Source IP: {src_ip}, Destination IP: {dst_ip}, Protocol: {protocol}")
 
@@ -54,25 +51,38 @@ def packet_callback(packet):
             print(f"  UDP - Source Port: {src_port}, Destination Port: {dst_port}")
 
         if packet.haslayer(Raw):
-            print(f"  Payload: {packet[Raw].load[:50]}...") # Print first 50 bytes of payload
+            print(f"  Payload: {packet[Raw].load[:50]}...")
     else:
         print(packet.summary())
+
+def exibir_relatorio_final():
+    print("\n" + "="*50)
+    print("Leitura do arquivo PCAP finalizada.")
+    print("="*50)
+    
+    print(f"\n[RESUMO HTTP FINAL] Total de requisições de navegação detectadas: {len(requisicoes_http)}")
+    if requisicoes_http:
+        print("-" * 50)
+        for http_info in requisicoes_http:
+            print(http_info)
+        print("-" * 50)
+    else:
+        print("Nenhum tráfego HTTP (porta 80) válido foi detectado neste arquivo.")
 
 def main():
     parser = argparse.ArgumentParser(description="Leitor de pacotes a partir de arquivo PCAP")
     parser.add_argument("-r", "--read", required=True, help="Caminho do arquivo .pcap")
     args = parser.parse_args()
 
-    print(f"Iniciando leitura do arquivo PCAP: {args.read}")
+    print(f"Iniciando leitura completa do arquivo PCAP: {args.read}\n")
 
     sniff(
         offline=args.read,
         prn=packet_callback,
+        count=2000,
         store=False
     )
-
-    print("Leitura do arquivo PCAP finalizada.")
-
+    exibir_relatorio_final()
 
 if __name__ == "__main__":
    main()
